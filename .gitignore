@@ -1,0 +1,10 @@
+/vendor/
+/.env
+/.env.local
+/.env.*.local
+/.idea/
+/.vscode/
+.DS_Store
+/node_modules/
+uploads/
+storage/
