@@ -1,0 +1,47 @@
+# docker/docker-compose.yml
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: docstore_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: docstore
+      POSTGRES_PASSWORD: docstore
+      POSTGRES_DB: docstore
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docstore_app
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: docstore
+      DB_USER: docstore
+      DB_PASSWORD: docstore
+      DATABASE_DSN: "pgsql:host=db;port=5432;dbname=docstore"
+    volumes:
+      - ./:/var/www/html:delegated
+    ports:
+      - "8080:80"
+    working_dir: /var/www/html
+
+  adminer:
+    image: adminer
+    container_name: docstore_adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+
+volumes:
+  db_data:
